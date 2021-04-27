@@ -1,0 +1,51 @@
+--Updown Counter [GENERIC]
+----------------------------------------------------------------------------------------
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+----------------------------------------------------------------------------------------
+ENTITY updown IS 
+GENERIC(n: INTEGER := 3);
+PORT (  
+           clk    : IN STD_LOGIC;
+		   rst    : IN STD_LOGIC;
+		   data   : OUT STD_LOGIC_VECTOR(n-1 downto 0)
+);
+END ENTITY;
+----------------------------------------------------------------------------------------
+ARCHITECTURE updown1 OF updown IS
+TYPE state IS (state1, state2);
+SIGNAL pr_state : state := state1;
+
+BEGIN
+PROCESS(clk, rst)
+VARIABLE count : UNSIGNED(n-1 downto 0);
+BEGIN 
+
+IF (rst = '1') THEN
+     count := (OTHERS=>'0');	  
+ELSIF rising_edge(clk) THEN
+----------------------------------------	 
+CASE pr_state IS
+WHEN state1 => 	
+     count := count + 1;	
+IF (count = 2**n-1) THEN
+    pr_state <= state2;
+ELSE
+    pr_state <= state1;
+END IF;
+----------------------------------------
+WHEN state2 => 
+       count := count - 1;
+IF (count = 0) THEN
+    pr_state <= state1;
+ELSE
+    pr_state <= state2;
+END IF;
+END CASE;
+----------------------------------------
+END IF;
+data <= STD_LOGIC_VECTOR(count);
+END PROCESS;
+END ARCHITECTURE;
+----------------------------------------------------------------------------------------
